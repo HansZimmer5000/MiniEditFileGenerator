@@ -83,10 +83,18 @@ def createApplicationJson():
 def createMiniEditJson():
     return {
         "application": createApplicationJson(),
-        "controllers": [createControllerJson("hostname", "remoteIP", 6653)],
-        "hosts": [createHostJson("1", "h1", 1, "", "300", "300")],
-        "links": [],
-        "switches": [],
+        "controllers": [
+            createControllerJson("hostname", "remoteIP", 6653)
+        ],
+        "hosts": [
+            createHostJson("1", "h1", 1, "", "300", "300")
+        ],
+        "links": [
+            createLinkJson("dest", {}, "src")
+        ],
+        "switches": [
+            createSwitchJson("1", "c0", "s1", 2, "default", "300", "200")
+        ],
         "version": "2"
     }
 
