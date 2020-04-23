@@ -140,6 +140,7 @@ def createHosts(hostCount):
 
     for x in range(1,hostCount+1):
         newHost = createHost(str(nextHostNum), "h"+str(nextHostNum), nextHostNum, "host", "300", "200")
+        nextHostNum += 1
         hosts.append(newHost)
 
     return hosts
@@ -179,7 +180,7 @@ def createLinks(coreSwitchCount, hostCount, controllername):
 
         nextACSNum += 2
 
-    # Create Links inside the Aggregator Switches
+    # Create Links inside the Aggregator Pods
     pass
 
     # Create Links inside the Core Switches
