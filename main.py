@@ -101,18 +101,20 @@ def createSwitches(coreSwitchCount):
         nextSwitchNum += 1
     
     # Create Aggregator Pods
+    nextTotalSwitchNum = nextSwitchNum
     nextSwitchNum = 1
+
     for x in range(1, aggregatorPodCount+1):
         toCore=[]
         toAccess=[]
 
-        for _y in range(1, int(aggregatorPodSwitchCount/2)+1):
-            #nextSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
+        for y in range(1, int(aggregatorPodSwitchCount/2)+1):
+            nextTotalSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
 
-            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "acs" + str(nextSwitchNum), nextSwitchNum, "default", "400", str(100+(x-1)*40))
+            newToCoreSwitch=createSwitch(str(nextTotalSwitchNum),"c0", "acs" + str(nextSwitchNum), nextTotalSwitchNum, "default", "400", str(100+(x-1)*40))
             nextSwitchNum += 1
 
-            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "axs" + str(nextSwitchNum), nextSwitchNum, "default", "300", str(100+(x-1)*40))
+            newToAccessSwitch=createSwitch(str(nextTotalSwitchNum),"c0", "axs" + str(nextSwitchNum), nextTotalSwitchNum, "default", "300", str(100+(x-1)*40))
             nextSwitchNum += 1
 
             newToCoreSwitch.update({"pod":x})
@@ -127,9 +129,9 @@ def createSwitches(coreSwitchCount):
     # Create Access Switches
     nextSwitchNum = 1
     for x in range(1, accessSwitchCount+1):
-        #nextSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
+        nextTotalSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
 
-        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "xs" + str(nextSwitchNum), nextSwitchNum, "default", "200", str(100+(x-1)*40))
+        newAccessSwitch=createSwitch(str(nextTotalSwitchNum),"c0", "xs" + str(nextSwitchNum), nextTotalSwitchNum, "default", "200", str(100+(x-1)*40))
         nextSwitchNum += 1
 
         accessSwitches.append(newAccessSwitch)
