@@ -3,7 +3,7 @@
 import json
 
 # nodeNum is a number!
-def createHostJson(number, hostname, nodeNum, sched, x, y):
+def createHost(number, hostname, nodeNum, sched, x, y):
     return {
         "number": number,
         "opts": {
@@ -16,7 +16,7 @@ def createHostJson(number, hostname, nodeNum, sched, x, y):
     }
 
 
-def createLinkJson(dest, opts, src):
+def createLink(dest, opts, src):
     return {
         "dest": dest,
         "opts": opts,
@@ -24,7 +24,7 @@ def createLinkJson(dest, opts, src):
     }
 
 # nodeNum is a number!
-def createSwitchJson(number, controller, hostname, nodeNum, switchType, x, y):
+def createSwitch(number, controller, hostname, nodeNum, switchType, x, y):
     return {
         "number": number,
         "opts": {
@@ -40,7 +40,7 @@ def createSwitchJson(number, controller, hostname, nodeNum, switchType, x, y):
     }
 
 # remotePort is a number!
-def createControllerJson(hostname, remoteIP, remotePort):
+def createController(hostname, remoteIP, remotePort):
     return {
         "opts": {
             "controllerProtocol": "tcp",
@@ -53,7 +53,7 @@ def createControllerJson(hostname, remoteIP, remotePort):
         "y": "175.0"
     } 
 
-def createApplicationJson():
+def createApplication():
     return {
             "dpctl": "",
             "ipBase": "10.0.0.0/8",
@@ -80,26 +80,99 @@ def createApplicationJson():
             "terminalType": "xterm"
     }
 
-def createMiniEditJson():
-    return {
-        "application": createApplicationJson(),
-        "controllers": [
-            createControllerJson("hostname", "remoteIP", 6653)
-        ],
-        "hosts": [
-            createHostJson("1", "h1", 1, "", "300", "300")
-        ],
-        "links": [
-            createLinkJson("dest", {}, "src")
-        ],
-        "switches": [
-            createSwitchJson("1", "c0", "s1", 2, "default", "300", "200")
-        ],
-        "version": "2"
-    }
+def createSwitches(coreSwitchCount):
+    coreSwitches=[]
+
+    aggregatorPodCount=coreSwitchCount
+    aggregatorPodSwitchCount=int(coreSwitchCount/2)
+    aggregatorPods=[]
+
+    accessSwitchCount=coreSwitchCount*coreSwitchCount
+    accessSwitches=[]
+
+    nextSwitchNum = 1
+
+    print("Creating Switches: Core(%d) Aggregator(%d * %d) Access (%d) ", coreSwitchCount, aggregatorPodCount, aggregatorPodSwitchCount, accessSwitchCount)
+
+    # Create Core Switches
+    for x in range(1, coreSwitchCount):
+        newCoreSwitch = createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+        coreSwitches.append(newCoreSwitch)
+        nextSwitchNum += 1
+    
+    # Create Aggregator Pods
+    for x in range(1, aggregatorPodCount):
+        toCore=[]
+        toAccess=[]
+
+        for y in range(1, int(aggregatorPodSwitchCount/2)):
+            #nextSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
+
+            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            nextSwitchNum +=1
+
+            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            nextSwitchNum += 1
+
+            toCore.append(newToCoreSwitch)
+            toAccess.append(newToAccessSwitch)
+
+        newAggregatorPod={"toCore":toCore,"toAccess":toAccess}
+
+        aggregatorPods.append(newAggregatorPod)
+    
+    # Create Access Switches
+    for x in range(1, accessSwitchCount):
+        #nextSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
+
+        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+        nextSwitchNum += 1
+
+        accessSwitches.append(newAccessSwitch)
+
+    return (coreSwitches, aggregatorPods, accessSwitches)
+
+def createHosts(hostCount):
+    hosts = []
+    nextHostNum = 1
+
+    for x in range(1,hostCount):
+        newHost = createHost(str(nextHostNum), "h"+str(nextHostNum), nextHostNum, "host", "300", "200")
+
+    return hosts
+
+def createSmall():
+    coreSwitchCount=4
+
+    # Create Controllers
+    controllers = [createController("c0", "remoteIP", "remotePort")]
+
+    # Create Switches
+    switches = createSwitches(coreSwitchCount)
+    
+    # Create Hosts
+    hostsCount = pow(coreSwitchCount, 2)
+    hosts = createHosts(hostsCount)
+
+    # Create Links
+    # TODO
+    links = []
+
+    # CreateApplication
+    application = createApplication()
+
+    # Gather the parts
+    with open('_small.mn', 'w') as outfile:
+        json.dump({
+            "application": application,
+            "controllers": controllers,
+            "hosts": hosts,
+            "links": links,
+            "switches": switches,
+            "version": "2"
+        }, outfile)
 
 if __name__ == "__main__":
     print("hallo")
 
-    with open('export.json', 'w') as outfile:
-        json.dump(createMiniEditJson(), outfile)
+    createSmall()
