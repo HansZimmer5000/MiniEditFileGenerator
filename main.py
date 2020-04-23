@@ -153,12 +153,31 @@ def createLinks(coreSwitchCount, hostCount, controllername):
         links.append(newLink)
     
     # Create Links from Access Switches to Aggregator Switches
-    # "axs<num>" with num being > 2 and square
-    pass
+    # "axs<num>" with num being >= 2 and square
+    aggregatorAccessSwitchCount=int(coreSwitchCount*2)
+    nextXSNum=1
+
+    for x in range(1,aggregatorAccessSwitchCount+1):
+        newLink = createLink("xs" + str(nextXSNum), {}, "axs" + str(x))
+        links.append(newLink)
+
+        newLink = createLink("xs" + str(nextXSNum + 1), {}, "axs" + str(x))
+        links.append(newLink)
+
+        nextXSNum += 2
 
     # Create Links from Aggregator Switches to Core Switches
-    # "acs<num>" with num being > 1 and not square
-    pass
+    # "acs<num>" with num being >= 1 and not square
+    nextACSNum=1
+
+    for x in range(1,coreSwitchCount+1):
+        newLink = createLink("acs" + str(nextACSNum), {}, "cs" + str(x))
+        links.append(newLink)
+
+        newLink = createLink("acs" + str(nextACSNum+4), {}, "cs" + str(x))
+        links.append(newLink)
+
+        nextACSNum += 2
 
     # Create Links inside the Aggregator Switches
     pass
