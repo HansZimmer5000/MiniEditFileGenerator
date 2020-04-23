@@ -84,7 +84,7 @@ def createSwitches(coreSwitchCount):
     coreSwitches=[]
 
     aggregatorPodCount=coreSwitchCount
-    aggregatorPodSwitchCount=int(coreSwitchCount/2)
+    aggregatorPodSwitchCount=int(coreSwitchCount)
     aggregatorPods=[]
 
     accessSwitchCount=coreSwitchCount*coreSwitchCount
@@ -95,23 +95,24 @@ def createSwitches(coreSwitchCount):
     print("Creating Switches: Core(%d) Aggregator(%d * %d) Access (%d) ", coreSwitchCount, aggregatorPodCount, aggregatorPodSwitchCount, accessSwitchCount)
 
     # Create Core Switches
-    for x in range(1, coreSwitchCount):
-        newCoreSwitch = createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+    for x in range(1, coreSwitchCount+1):
+        newCoreSwitch = createSwitch(str(nextSwitchNum),"c0", "cs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
         coreSwitches.append(newCoreSwitch)
         nextSwitchNum += 1
     
     # Create Aggregator Pods
-    for x in range(1, aggregatorPodCount):
+    for x in range(1, aggregatorPodCount+1):
         toCore=[]
         toAccess=[]
 
-        for y in range(1, int(aggregatorPodSwitchCount/2)):
+        for y in range(1, int(aggregatorPodSwitchCount/2)+1):
             #nextSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
 
-            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "acs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            {}.
             nextSwitchNum +=1
 
-            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "axs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
             nextSwitchNum += 1
 
             toCore.append(newToCoreSwitch)
@@ -122,10 +123,10 @@ def createSwitches(coreSwitchCount):
         aggregatorPods.append(newAggregatorPod)
     
     # Create Access Switches
-    for x in range(1, accessSwitchCount):
+    for x in range(1, accessSwitchCount+1):
         #nextSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
 
-        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "s" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "xs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
         nextSwitchNum += 1
 
         accessSwitches.append(newAccessSwitch)
@@ -136,33 +137,64 @@ def createHosts(hostCount):
     hosts = []
     nextHostNum = 1
 
-    for x in range(1,hostCount):
+    for x in range(1,hostCount+1):
         newHost = createHost(str(nextHostNum), "h"+str(nextHostNum), nextHostNum, "host", "300", "200")
+        hosts.append(newHost)
 
     return hosts
+
+def createLinks(coreSwitchCount, hostCount, controllername):
+    links=[]
+
+    # Create Links from Host to Access Switch
+    for x in range(1, hostCount+1):
+        newLink = createLink("h" + str(x), {}, "xs" + str(x))
+        links.append(newLink)
+    
+    # Create Links from Access Switches to Aggregator Switches
+    pass
+
+    # Create Links from Aggregator Switches to Core Switches
+    pass
+
+    # Create Links inside the Aggregator Switches
+    pass
+
+    # Create Links inside the Core Switches
+    pass
+
+    return links
 
 def createSmall():
     coreSwitchCount=4
 
     # Create Controllers
-    controllers = [createController("c0", "127.0.0.1", 6653)]
+    controllername = "c0"
+    controllers = [createController(controllername, "127.0.0.1", 6653)]
 
     # Create Switches
-    switches = createSwitches(coreSwitchCount)
+    (coreSwitches,aggregatorPods,accessSwitches) = createSwitches(coreSwitchCount)
+
+    switches = []
+    switches += coreSwitches
+    for aggregatorPod in aggregatorPods:
+        switches += aggregatorPod["toCore"]
+        switches += aggregatorPod["toAccess"]
+    switches += accessSwitches
+
     
     # Create Hosts
     hostsCount = pow(coreSwitchCount, 2)
     hosts = createHosts(hostsCount)
 
     # Create Links
-    # TODO
-    links = []
+    links = createLinks(coreSwitchCount, hostsCount, controllername)
 
     # CreateApplication
     application = createApplication()
 
     # Gather the parts
-    with open('_small.mn', 'w') as outfile:
+    with open('small_export.json', 'w') as outfile:
         json.dump({
             "application": application,
             "controllers": controllers,
