@@ -49,8 +49,8 @@ def createController(hostname, remoteIP, remotePort):
             "remoteIP": remoteIP,
             "remotePort": remotePort 
         },
-        "x": "760.0",
-        "y": "175.0"
+        "x": "600.0",
+        "y": "100.0"
     } 
 
 def createApplication():
@@ -96,7 +96,7 @@ def createSwitches(coreSwitchCount):
 
     # Create Core Switches
     for x in range(1, coreSwitchCount+1):
-        newCoreSwitch = createSwitch(str(nextSwitchNum),"c0", "cs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+        newCoreSwitch = createSwitch(str(nextSwitchNum),"c0", "cs" + str(nextSwitchNum), nextSwitchNum, "default", "500", str(100+(x-1)*40))
         coreSwitches.append(newCoreSwitch)
         nextSwitchNum += 1
     
@@ -106,13 +106,13 @@ def createSwitches(coreSwitchCount):
         toCore=[]
         toAccess=[]
 
-        for y in range(1, int(aggregatorPodSwitchCount/2)+1):
+        for _y in range(1, int(aggregatorPodSwitchCount/2)+1):
             #nextSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
 
-            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "acs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "acs" + str(nextSwitchNum), nextSwitchNum, "default", "400", str(100+(x-1)*40))
             nextSwitchNum += 1
 
-            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "axs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+            newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "axs" + str(nextSwitchNum), nextSwitchNum, "default", "300", str(100+(x-1)*40))
             nextSwitchNum += 1
 
             newToCoreSwitch.update({"pod":x})
@@ -129,7 +129,7 @@ def createSwitches(coreSwitchCount):
     for x in range(1, accessSwitchCount+1):
         #nextSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
 
-        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "xs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
+        newAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "xs" + str(nextSwitchNum), nextSwitchNum, "default", "200", str(100+(x-1)*40))
         nextSwitchNum += 1
 
         accessSwitches.append(newAccessSwitch)
@@ -141,7 +141,7 @@ def createHosts(hostCount):
     nextHostNum = 1
 
     for x in range(1,hostCount+1):
-        newHost = createHost(str(nextHostNum), "h"+str(nextHostNum), nextHostNum, "host", "300", "200")
+        newHost = createHost(str(nextHostNum), "h"+str(nextHostNum), nextHostNum, "host", "100", str(100+(x-1)*40))
         nextHostNum += 1
         hosts.append(newHost)
 
