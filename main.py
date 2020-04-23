@@ -181,10 +181,30 @@ def createLinks(coreSwitchCount, hostCount, controllername):
         nextACSNum += 2
 
     # Create Links inside the Aggregator Pods
-    pass
+    # first acs is 1, axs is 2. Next two switches in this pod are acs 3 and axs 4 (Example for CoreSwitch=4)
+    aggregatorSwitchCount = aggregatorAccessSwitchCount * 2
+    for x in range(1, aggregatorSwitchCount + 1):
+        if (x % 2) == 0:
+            currentSwitch = "axs" + str(x)
+            links.append(createLink(currentSwitch, {}, "acs" + str(x+1)))
+            links.append(createLink(currentSwitch, {}, "axs" + str(x+2)))
+            links.append(createLink(currentSwitch, {}, "acs" + str(x+3)))
+        else:
+            currentSwitch = "acs" + str(x)
+            links.append(createLink(currentSwitch, {}, "axs" + str(x+1)))
+            links.append(createLink(currentSwitch, {}, "acs" + str(x+2)))
+            links.append(createLink(currentSwitch, {}, "axs" + str(x+3)))
+        
 
     # Create Links inside the Core Switches
-    pass
+    for x in range(1, coreSwitchCount + 1):
+        for y in range (1,4): 
+            targetNum = x+y
+            if targetNum > coreSwitchCount:
+                targetNum %= coreSwitchCount
+
+            newLink = createLink("cs" + str(x), {}, "cs" + str(targetNum))
+            links.append(newLink)
 
     return links
 
