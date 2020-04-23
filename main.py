@@ -101,6 +101,7 @@ def createSwitches(coreSwitchCount):
         nextSwitchNum += 1
     
     # Create Aggregator Pods
+    nextSwitchNum = 1
     for x in range(1, aggregatorPodCount+1):
         toCore=[]
         toAccess=[]
@@ -124,6 +125,7 @@ def createSwitches(coreSwitchCount):
         aggregatorPods.append(newAggregatorPod)
     
     # Create Access Switches
+    nextSwitchNum = 1
     for x in range(1, accessSwitchCount+1):
         #nextSwitchNum=nextNodeNum+coreSwitchCount+aggregatorPodCount*aggregatorPodSwitchCount
 
@@ -146,6 +148,14 @@ def createHosts(hostCount):
     return hosts
 
 def createLinks(coreSwitchCount, hostCount, controllername):
+    # Link Count with K=4          
+    # Links Host -> Access = 16     16
+    # Links Access -> Aggr = 16     32
+    # Links Aggr -> Core   = 16     48
+    # Links Core -> Core   = 12     60
+    # Links Pods -> Pods   = 12*4   108
+
+
     links=[]
 
     # Create Links from Host to Access Switch
@@ -184,16 +194,29 @@ def createLinks(coreSwitchCount, hostCount, controllername):
     # first acs is 1, axs is 2. Next two switches in this pod are acs 3 and axs 4 (Example for CoreSwitch=4)
     aggregatorSwitchCount = aggregatorAccessSwitchCount * 2
     for x in range(1, aggregatorSwitchCount + 1):
+        podNumber = int(x / 4)
+        if (x % coreSwitchCount) != 0:
+            podNumber += 1
+
+        currentHighestNum = coreSwitchCount * podNumber
+        currentLowestNum = currentHighestNum - (coreSwitchCount - 1)
+        print("Current Pod Number: ", podNumber, "Highest Num: ", currentHighestNum)
+
         if (x % 2) == 0:
             currentSwitch = "axs" + str(x)
-            links.append(createLink(currentSwitch, {}, "acs" + str(x+1)))
-            links.append(createLink(currentSwitch, {}, "axs" + str(x+2)))
-            links.append(createLink(currentSwitch, {}, "acs" + str(x+3)))
         else:
             currentSwitch = "acs" + str(x)
-            links.append(createLink(currentSwitch, {}, "axs" + str(x+1)))
-            links.append(createLink(currentSwitch, {}, "acs" + str(x+2)))
-            links.append(createLink(currentSwitch, {}, "axs" + str(x+3)))
+
+        for offset in range(1,4):
+            nextNum = x + offset
+            if nextNum > currentHighestNum:
+                nextNum %= currentHighestNum
+                nextNum += (currentLowestNum - 1)
+
+            if (nextNum % 2) == 0:
+                links.append(createLink(currentSwitch, {}, "axs" + str(nextNum)))
+            else:
+                links.append(createLink(currentSwitch, {}, "acs" + str(nextNum)))
         
 
     # Create Links inside the Core Switches
