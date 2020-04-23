@@ -109,12 +109,13 @@ def createSwitches(coreSwitchCount):
             #nextSwitchNum=nextNodeNum+coreSwitchCount+(x-1)*aggregatorPodSwitchCount+(y-1)*2
 
             newToCoreSwitch=createSwitch(str(nextSwitchNum),"c0", "acs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
-            {}.
-            nextSwitchNum +=1
+            nextSwitchNum += 1
 
             newToAccessSwitch=createSwitch(str(nextSwitchNum),"c0", "axs" + str(nextSwitchNum), nextSwitchNum, "default", "100", "100")
             nextSwitchNum += 1
 
+            newToCoreSwitch.update({"pod":x})
+            newToAccessSwitch.update({"pod":x})
             toCore.append(newToCoreSwitch)
             toAccess.append(newToAccessSwitch)
 
@@ -152,9 +153,11 @@ def createLinks(coreSwitchCount, hostCount, controllername):
         links.append(newLink)
     
     # Create Links from Access Switches to Aggregator Switches
+    # "axs<num>" with num being > 2 and square
     pass
 
     # Create Links from Aggregator Switches to Core Switches
+    # "acs<num>" with num being > 1 and not square
     pass
 
     # Create Links inside the Aggregator Switches
