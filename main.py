@@ -145,7 +145,7 @@ def createSmall():
     coreSwitchCount=4
 
     # Create Controllers
-    controllers = [createController("c0", "remoteIP", "remotePort")]
+    controllers = [createController("c0", "127.0.0.1", 6653)]
 
     # Create Switches
     switches = createSwitches(coreSwitchCount)
