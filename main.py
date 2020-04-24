@@ -18,9 +18,9 @@ def createHost(number, hostname, nodeNum, sched, x, y):
 
 def createLink(dest, opts, src):
     return {
-        "dest": dest,
+        "src": src,
         "opts": opts,
-        "src": src
+        "dest": dest
     }
 
 # nodeNum is a number!
@@ -171,30 +171,35 @@ def createLinks(coreSwitchCount, hostCount, controllername):
     aggregatorAccessSwitchCount=int(coreSwitchCount*2)
     nextXSNum=1
 
-    for x in range(1,aggregatorAccessSwitchCount+1):
-        newLink = createLink("xs" + str(nextXSNum), {}, "axs" + str(x))
-        links.append(newLink)
+    for x in range(2,(aggregatorAccessSwitchCount*2)+1):
+        if (x % 2) == 0: 
+            newLink = createLink("xs" + str(nextXSNum), {}, "axs" + str(x))
+            links.append(newLink)
 
-        newLink = createLink("xs" + str(nextXSNum + 1), {}, "axs" + str(x))
-        links.append(newLink)
+            newLink = createLink("xs" + str(nextXSNum + 1), {}, "axs" + str(x))
+            links.append(newLink)
 
-        nextXSNum += 2
+            nextXSNum += 2
 
     # Create Links from Aggregator Switches to Core Switches
     # "acs<num>" with num being >= 1 and not square
     nextACSNum=1
-
     for x in range(1,coreSwitchCount+1):
-        newLink = createLink("acs" + str(nextACSNum), {}, "cs" + str(x))
-        links.append(newLink)
+        baseACSNum=nextACSNum
+        for y in range (0, int((aggregatorAccessSwitchCount*2)/coreSwitchCount)):
+            nextACSNum = baseACSNum + (y * 2)
+            if nextACSNum > (aggregatorAccessSwitchCount*2):
+                nextACSNum %= (aggregatorAccessSwitchCount*2)
 
-        newLink = createLink("acs" + str(nextACSNum+4), {}, "cs" + str(x))
-        links.append(newLink)
+            newLink = createLink("acs" + str(nextACSNum), {}, "cs" + str(x))
+            links.append(newLink)
 
         nextACSNum += 2
 
     # Create Links inside the Aggregator Pods
     # first acs is 1, axs is 2. Next two switches in this pod are acs 3 and axs 4 (Example for CoreSwitch=4)
+    # TODO Are these links done twice? (acs15->acs13 && acs13->acs15)
+    
     aggregatorSwitchCount = aggregatorAccessSwitchCount * 2
     for x in range(1, aggregatorSwitchCount + 1):
         podNumber = int(x / 4)
@@ -223,6 +228,7 @@ def createLinks(coreSwitchCount, hostCount, controllername):
         
 
     # Create Links inside the Core Switches
+    # TODO Are these links done twice? (cs1->cs2 && cs2->cs1)
     for x in range(1, coreSwitchCount + 1):
         for y in range (1,4): 
             targetNum = x+y
