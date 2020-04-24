@@ -43,9 +43,10 @@ def createSwitch(number, controller, hostname, nodeNum, switchType, x, y):
 # remotePort is a number!
 def createController(hostname, remoteIP, remotePort):
     return {
+        
         "opts": {
             "controllerProtocol": "tcp",
-            "controllerType": "ref",
+            "controllerType": "remote",
             "hostname": hostname,
             "remoteIP": remoteIP,
             "remotePort": remotePort 
