@@ -1,3 +1,8 @@
+# Own Exports
+small.json
+medium.json
+large.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

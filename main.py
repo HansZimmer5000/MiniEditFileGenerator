@@ -1,6 +1,7 @@
 #!/bin/python
 
 import json
+import time
 
 # nodeNum is a number!
 def createHost(number, hostname, nodeNum, sched, x, y):
@@ -92,7 +93,7 @@ def createSwitches(coreSwitchCount):
 
     nextSwitchNum = 1
 
-    print("Creating Switches: Core(%d) Aggregator(%d * %d) Access (%d) ", coreSwitchCount, aggregatorPodCount, aggregatorPodSwitchCount, accessSwitchCount)
+    print("Creating", coreSwitchCount+accessSwitchCount*2, "Switches:","Core(", coreSwitchCount,") Access & Aggregator Switch each(", accessSwitchCount,")")
 
     # Create Core Switches
     for x in range(1, coreSwitchCount+1):
@@ -208,7 +209,6 @@ def createLinks(coreSwitchCount, hostCount, controllername):
 
         currentHighestNum = coreSwitchCount * podNumber
         currentLowestNum = currentHighestNum - (coreSwitchCount - 1)
-        print("Current Pod Number: ", podNumber, "Highest Num: ", currentHighestNum)
 
         if (x % 2) == 0:
             currentSwitch = "axs" + str(x)
@@ -240,8 +240,8 @@ def createLinks(coreSwitchCount, hostCount, controllername):
 
     return links
 
-def createSmall():
-    coreSwitchCount=4
+def createTopology(coreSwitchCount, exportFile):
+    startTime = time.time()
 
     # Create Controllers
     controllername = "c0"
@@ -269,7 +269,7 @@ def createSmall():
     application = createApplication()
 
     # Gather the parts
-    with open('small_export.json', 'w') as outfile:
+    with open(exportFile, 'w') as outfile:
         json.dump({
             "application": application,
             "controllers": controllers,
@@ -278,8 +278,15 @@ def createSmall():
             "switches": switches,
             "version": "2"
         }, outfile)
+    
+    endTime = time.time()
+    duration = endTime - startTime
+    durationSec = int(duration)
+    print("Generation took ", durationSec, "Seconds")
 
 if __name__ == "__main__":
-    print("hallo")
+    print("Beware! This generator is currently quite hardcoded to work with the topolgy described in 'SDN on ACIDs'!\n")
 
-    createSmall()
+    createTopology(4,'small.json')
+    createTopology(8,'medium.json')
+    createTopology(12,'large.json')
