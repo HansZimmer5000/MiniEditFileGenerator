@@ -24,6 +24,25 @@ class LinkTests(unittest.TestCase):
 
         checkList(links, 16, contains, not_contains, self)
 
+    def testCreateHostToAccessLinks12(self):
+        links = generator.createHostToAccessLinks(12)
+        contains = [
+            {"src": "h0", "opts": {}, "dest": "xs0"},
+            {"src": "h1", "opts": {}, "dest": "xs1"},
+            {"src": "h2", "opts": {}, "dest": "xs2"},
+            {"src": "h8", "opts": {}, "dest": "xs8"},
+            {"src": "h15", "opts": {}, "dest": "xs15"},
+
+            {"src": "h142", "opts": {}, "dest": "xs142"},
+            {"src": "h143", "opts": {}, "dest": "xs143"},
+        ]
+
+        not_contains = [
+            {"src": "xs1", "opts": {}, "dest": "h1"},
+        ]
+
+        checkList(links, 144, contains, not_contains, self)
+
     def testCreateAccessToAggregatorLinks(self):
         links = generator.createAccessToAggregatorLinks(4)
         contains = [
@@ -49,6 +68,36 @@ class LinkTests(unittest.TestCase):
         ]
 
         checkList(links, 16, contains, [], self)
+
+    def testCreateAccessToAggregatorLinks12(self):
+        links = generator.createAccessToAggregatorLinks(12)
+
+        contains = [
+            {"src": "xs0", "opts": {}, "dest": "axs00"},
+            {"src": "xs1", "opts": {}, "dest": "axs00"},
+            {"src": "xs2", "opts": {}, "dest": "axs01"},
+            {"src": "xs3", "opts": {}, "dest": "axs01"},
+            {"src": "xs4", "opts": {}, "dest": "axs02"},
+            {"src": "xs5", "opts": {}, "dest": "axs02"},
+            {"src": "xs6", "opts": {}, "dest": "axs03"},
+            {"src": "xs7", "opts": {}, "dest": "axs03"},
+            {"src": "xs8", "opts": {}, "dest": "axs04"},
+            {"src": "xs9", "opts": {}, "dest": "axs04"},
+            {"src": "xs10", "opts": {}, "dest": "axs05"},
+            {"src": "xs11", "opts": {}, "dest": "axs05"},
+
+            {"src": "xs12", "opts": {}, "dest": "axs10"},
+            {"src": "xs13", "opts": {}, "dest": "axs10"},
+            {"src": "xs14", "opts": {}, "dest": "axs11"},
+            {"src": "xs15", "opts": {}, "dest": "axs11"},
+
+            {"src": "xs140", "opts": {}, "dest": "axs114"},
+            {"src": "xs141", "opts": {}, "dest": "axs114"},
+            {"src": "xs142", "opts": {}, "dest": "axs115"},
+            {"src": "xs143", "opts": {}, "dest": "axs115"},
+        ]
+
+        checkList(links, 144, contains, [], self)
 
     def testCreateInterAggregatorLinks(self):
         links = generator.createInterAggregatorLinks(4)
@@ -94,6 +143,65 @@ class LinkTests(unittest.TestCase):
 
         checkList(links, 24, contains, [], self)
 
+
+    def testCreateInterAggregatorLinks12(self):
+        links = generator.createInterAggregatorLinks(12)
+        contains = [
+            {"src": "acs00", "opts": {}, "dest": "acs01"},
+            {"src": "acs00", "opts": {}, "dest": "axs00"},
+            {"src": "acs00", "opts": {}, "dest": "axs01"},
+
+            # {"src": "acs01", "opts": {}, "dest": "acs00"},
+            {"src": "acs01", "opts": {}, "dest": "axs00"},
+            {"src": "acs01", "opts": {}, "dest": "axs01"},
+
+            # {"src": "axs00", "opts": {}, "dest": "acs00"},
+            # {"src": "axs00", "opts": {}, "dest": "acs01"},
+            {"src": "axs00", "opts": {}, "dest": "axs01"},
+
+            # {"src": "axs01", "opts": {}, "dest": "acs00"},
+            # {"src": "axs01", "opts": {}, "dest": "acs01"},
+            # {"src": "axs01", "opts": {}, "dest": "axs00"}
+
+            {"src": "acs02", "opts": {}, "dest": "acs03"},
+            {"src": "acs02", "opts": {}, "dest": "axs02"},
+            {"src": "acs02", "opts": {}, "dest": "axs03"},
+            {"src": "acs03", "opts": {}, "dest": "axs02"},
+            {"src": "acs03", "opts": {}, "dest": "axs03"},
+            {"src": "axs02", "opts": {}, "dest": "axs03"},
+
+            {"src": "acs04", "opts": {}, "dest": "acs05"},
+            {"src": "acs04", "opts": {}, "dest": "axs04"},
+            {"src": "acs04", "opts": {}, "dest": "axs05"},
+            {"src": "acs05", "opts": {}, "dest": "axs04"},
+            {"src": "acs05", "opts": {}, "dest": "axs05"},
+            {"src": "axs04", "opts": {}, "dest": "axs05"},
+
+
+            {"src": "acs10", "opts": {}, "dest": "acs11"},
+            {"src": "acs10", "opts": {}, "dest": "axs10"},
+            {"src": "acs10", "opts": {}, "dest": "axs11"},
+            {"src": "acs11", "opts": {}, "dest": "axs10"},
+            {"src": "acs11", "opts": {}, "dest": "axs11"},
+            {"src": "axs10", "opts": {}, "dest": "axs11"},
+
+            {"src": "acs20", "opts": {}, "dest": "acs21"},
+            {"src": "acs20", "opts": {}, "dest": "axs20"},
+            {"src": "acs20", "opts": {}, "dest": "axs21"},
+            {"src": "acs21", "opts": {}, "dest": "axs20"},
+            {"src": "acs21", "opts": {}, "dest": "axs21"},
+            {"src": "axs20", "opts": {}, "dest": "axs21"},
+
+            {"src": "acs30", "opts": {}, "dest": "acs31"},
+            {"src": "acs30", "opts": {}, "dest": "axs30"},
+            {"src": "acs30", "opts": {}, "dest": "axs31"},
+            {"src": "acs31", "opts": {}, "dest": "axs30"},
+            {"src": "acs31", "opts": {}, "dest": "axs31"},
+            {"src": "axs30", "opts": {}, "dest": "axs31"},
+        ]
+
+        checkList(links, 12*18, contains, [], self)
+
     def testCreateAggregatorToCoreLinks(self):
         links = generator.createAggregatorToCoreLinks(4)
         contains = [
@@ -120,6 +228,50 @@ class LinkTests(unittest.TestCase):
 
         checkList(links, 16, contains, [], self)
 
+    def testCreateAggregatorToCoreLinks12(self):
+        links = generator.createAggregatorToCoreLinks(12)
+        contains = [
+            {"src": "acs00", "opts": {}, "dest": "cs0"},
+            {"src": "acs00", "opts": {}, "dest": "cs1"},
+            {"src": "acs01", "opts": {}, "dest": "cs1"},
+            {"src": "acs01", "opts": {}, "dest": "cs2"},
+            {"src": "acs02", "opts": {}, "dest": "cs2"},
+            {"src": "acs02", "opts": {}, "dest": "cs3"},
+            {"src": "acs03", "opts": {}, "dest": "cs3"},
+            {"src": "acs03", "opts": {}, "dest": "cs4"},
+            {"src": "acs04", "opts": {}, "dest": "cs4"},
+            {"src": "acs04", "opts": {}, "dest": "cs5"},
+            {"src": "acs05", "opts": {}, "dest": "cs5"},
+            {"src": "acs05", "opts": {}, "dest": "cs6"},
+
+            {"src": "acs10", "opts": {}, "dest": "cs2"},
+            {"src": "acs10", "opts": {}, "dest": "cs3"},
+            {"src": "acs11", "opts": {}, "dest": "cs3"},
+            {"src": "acs11", "opts": {}, "dest": "cs4"},
+
+            {"src": "acs20", "opts": {}, "dest": "cs4"},
+            {"src": "acs20", "opts": {}, "dest": "cs5"},
+            {"src": "acs21", "opts": {}, "dest": "cs5"},
+            {"src": "acs21", "opts": {}, "dest": "cs6"},
+
+            {"src": "acs30", "opts": {}, "dest": "cs6"},
+            {"src": "acs30", "opts": {}, "dest": "cs7"},
+            {"src": "acs31", "opts": {}, "dest": "cs7"},
+            {"src": "acs31", "opts": {}, "dest": "cs8"},
+
+            {"src": "acs40", "opts": {}, "dest": "cs8"},
+            {"src": "acs40", "opts": {}, "dest": "cs9"},
+            {"src": "acs41", "opts": {}, "dest": "cs9"},
+            {"src": "acs41", "opts": {}, "dest": "cs10"},
+
+            {"src": "acs50", "opts": {}, "dest": "cs10"},
+            {"src": "acs50", "opts": {}, "dest": "cs11"},
+            {"src": "acs51", "opts": {}, "dest": "cs11"},
+            {"src": "acs51", "opts": {}, "dest": "cs0"},
+        ]
+
+        checkList(links, 144, contains, [], self)
+
     def testCreateInterCoreLinks(self):
         links = generator.createInterCoreLinks(4)
         contains = [
@@ -132,6 +284,51 @@ class LinkTests(unittest.TestCase):
         ]
 
         checkList(links, 6, contains, [], self)
+
+    def testCreateInterCoreLinks8(self):
+        links = generator.createInterCoreLinks(8)
+        contains = [
+            {"src": "cs0", "opts": {}, "dest": "cs1"},
+            {"src": "cs0", "opts": {}, "dest": "cs2"},
+            {"src": "cs0", "opts": {}, "dest": "cs3"},
+            {"src": "cs1", "opts": {}, "dest": "cs2"},
+            {"src": "cs1", "opts": {}, "dest": "cs3"},
+            {"src": "cs2", "opts": {}, "dest": "cs3"},
+
+            {"src": "cs4", "opts": {}, "dest": "cs5"},
+            {"src": "cs4", "opts": {}, "dest": "cs6"},
+            {"src": "cs4", "opts": {}, "dest": "cs7"},
+            {"src": "cs5", "opts": {}, "dest": "cs6"},
+            {"src": "cs5", "opts": {}, "dest": "cs7"},
+            {"src": "cs6", "opts": {}, "dest": "cs7"},
+        ]
+        checkList(links, 12, contains, [], self)
+
+    def testCreateInterCoreLinks12(self):
+        links = generator.createInterCoreLinks(12)
+        contains = [
+            {"src": "cs0", "opts": {}, "dest": "cs1"},
+            {"src": "cs0", "opts": {}, "dest": "cs2"},
+            {"src": "cs0", "opts": {}, "dest": "cs3"},
+            {"src": "cs1", "opts": {}, "dest": "cs2"},
+            {"src": "cs1", "opts": {}, "dest": "cs3"},
+            {"src": "cs2", "opts": {}, "dest": "cs3"},
+
+            {"src": "cs4", "opts": {}, "dest": "cs5"},
+            {"src": "cs4", "opts": {}, "dest": "cs6"},
+            {"src": "cs4", "opts": {}, "dest": "cs7"},
+            {"src": "cs5", "opts": {}, "dest": "cs6"},
+            {"src": "cs5", "opts": {}, "dest": "cs7"},
+            {"src": "cs6", "opts": {}, "dest": "cs7"},
+
+            {"src": "cs8", "opts": {}, "dest": "cs9"},
+            {"src": "cs8", "opts": {}, "dest": "cs10"},
+            {"src": "cs8", "opts": {}, "dest": "cs11"},
+            {"src": "cs9", "opts": {}, "dest": "cs10"},
+            {"src": "cs9", "opts": {}, "dest": "cs11"},
+            {"src": "cs10", "opts": {}, "dest": "cs11"},
+        ]
+        checkList(links, 18, contains, [], self)
 
     def testCreateLinks(self):
         links = generator.createLinks(4)
@@ -158,6 +355,35 @@ class LinkTests(unittest.TestCase):
         ]
 
         checkList(links, 16+16+4*6+16+6, contains, not_contains, self)
+    
+    def testCreateLinks8(self):
+        coreswitch_count = 8
+        links = generator.createLinks(coreswitch_count)
+        
+        contains = [
+            {"src": "h1", "opts": {}, "dest": "xs1"},
+            {"src": "xs1", "opts": {}, "dest": "axs00"},
+            {"src": "axs00", "opts": {}, "dest": "axs01"},
+            {"src": "acs00", "opts": {}, "dest": "axs01"},
+            {"src": "acs00", "opts": {}, "dest": "cs1"},
+            {"src": "cs2", "opts": {}, "dest": "cs3"},
+            {"src": "acs21", "opts": {}, "dest": "cs5"},
+            {"src": "acs21", "opts": {}, "dest": "axs21"},
+            {"src": "xs19", "opts": {}, "dest": "axs21"},
+            {"src": "h19", "opts": {}, "dest": "xs19"},
+        ]
+
+        # Links are supposed to be always pointin to the right / inwards (host -> access -> aggregator -> core)
+        not_contains = [
+            {"src": "xs1", "opts": {}, "dest": "h1"},
+            {"src": "axs00", "opts": {}, "dest": "xs1"},
+            {"src": "axs00", "opts": {}, "dest": "acs00"},
+            {"src": "cs0", "opts": {}, "dest": "acs00"},
+        ]
+
+        inter_connect_link_count = 6*(int(coreswitch_count/4))
+        checkList(links, (coreswitch_count**2)*3+(coreswitch_count+1)
+                  * inter_connect_link_count, contains, not_contains, self)
 
 
 class NodeTests(unittest.TestCase):
@@ -212,7 +438,7 @@ class NodeTests(unittest.TestCase):
 
         checkList(hosts, 16, contains, not_contains, self)
 
-    def testCreateSwitches_8(self):
+    def testCreateSwitches8(self):
         switches = generator.createSwitches(8)
 
         core_contains = [
@@ -244,14 +470,14 @@ class NodeTests(unittest.TestCase):
                 "y": "1340"
             }
         ]
-        
-        #print(switches)
+
+        # print(switches)
         core_not_contains = []
 
-        checkList(switches, 8+8**2+8**2, core_contains, core_not_contains, self)
+        checkList(switches, 8+8**2+8**2, core_contains,
+                  core_not_contains, self)
 
-
-    def testCreateSwitches_12(self):
+    def testCreateSwitches12(self):
         switches = generator.createSwitches(12)
 
         contains = [
@@ -283,11 +509,10 @@ class NodeTests(unittest.TestCase):
                 "y": "2940"
             }
         ]
-        #print(switches)
+        # print(switches)
         not_contains = []
 
         checkList(switches, 12+12**2+12**2, contains, not_contains, self)
-
 
     def testCreateSwitches(self):
         switches = generator.createSwitches(4)
@@ -321,7 +546,7 @@ class NodeTests(unittest.TestCase):
                 "y": "380"
             }
         ]
-        
+
         not_contains = []
 
         checkList(switches, 4+16+16, contains, not_contains, self)
@@ -524,7 +749,7 @@ class NodeTests(unittest.TestCase):
                 "controllers": [
                     "c0"
                 ],
-                    "dpid": "11",
+                "dpid": "11",
                 "hostname": "xs16",
                 "nodeNum": 16,
                 "switchType": "default"
@@ -600,7 +825,7 @@ class NodeTests(unittest.TestCase):
                 "controllers": [
                     "c0"
                 ],
-                    "dpid": "15",
+                "dpid": "15",
                 "hostname": "xs16",
                 "nodeNum": 20,
                 "switchType": "default"
