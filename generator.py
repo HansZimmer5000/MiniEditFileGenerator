@@ -123,23 +123,24 @@ def createAggregatorSwitches(coreswitch_count, global_next_switch_num):
     acs_count = int(coreswitch_count/2)
     axs_count = acs_count
     pod_count = coreswitch_count
+    pod_switches_count = coreswitch_count
     acs_x = "400"
     acs_y = 100
     axs_x = "300"
     axs_y = 100
 
     for current_pod in range(0, pod_count):
-        current_num = current_pod * 4
+        current_num = current_pod * pod_switches_count
         (tmp_switches, global_next_switch_num) = __createSwitchesOf(
             "acs" + str(current_pod), acs_count, global_next_switch_num, acs_x, acs_y, current_num)
-        acs_y += 80
+        acs_y += 40 * acs_count
 
         agg_switches += tmp_switches
 
         current_num += acs_count
         (tmp_switches, global_next_switch_num) = __createSwitchesOf(
             "axs" + str(current_pod), axs_count, global_next_switch_num, axs_x, axs_y, current_num)
-        axs_y += 80
+        axs_y += 40 * axs_count
 
         agg_switches += tmp_switches
 
@@ -294,16 +295,15 @@ def createInterCoreLinks(coreswitch_count):
     interconnection_degree = 3
     links = []
 
-    if coreswitch_count >= 4:
-        for current_index1 in range(0, coreswitch_count):
-            current_switch1 = "cs" + str(current_index1)
+    for current_index1 in range(0, coreswitch_count):
+        current_switch1 = "cs" + str(current_index1)
 
-            for current_index2 in range(1, interconnection_degree+1):
-                current_switch2 = "cs" + \
-                    str((current_index2 + current_index1) % coreswitch_count)
+        for current_index2 in range(1, interconnection_degree+1):
+            current_switch2 = "cs" + \
+                str((current_index2 + current_index1) % coreswitch_count)
 
-                new_link = createLink(current_switch1, {}, current_switch2)
-                addUniqueLinks(links, new_link)
+            new_link = createLink(current_switch1, {}, current_switch2)
+            addUniqueLinks(links, new_link)
 
     return links
 

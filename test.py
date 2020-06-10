@@ -212,10 +212,87 @@ class NodeTests(unittest.TestCase):
 
         checkList(hosts, 16, contains, not_contains, self)
 
+    def testCreateSwitches_8(self):
+        switches = generator.createSwitches(8)
+
+        core_contains = [
+            {
+                "number": "0",
+                "opts": {
+                    "controllers": [
+                        "c0"
+                    ],
+                    "dpid": "1",
+                    "hostname": "cs0",
+                    "nodeNum": 0,
+                    "switchType": "default"
+                },
+                "x": "500",
+                "y": "100"
+            },            {
+                "number": "63",
+                "opts": {
+                    "controllers": [
+                        "c0"
+                    ],
+                    "dpid": "88",
+                    "hostname": "axs73",
+                    "nodeNum": 135,
+                    "switchType": "default"
+                },
+                "x": "300",
+                "y": "1340"
+            }
+        ]
+        
+        #print(switches)
+        core_not_contains = []
+
+        checkList(switches, 8+8**2+8**2, core_contains, core_not_contains, self)
+
+
+    def testCreateSwitches_12(self):
+        switches = generator.createSwitches(12)
+
+        contains = [
+            {
+                "number": "0",
+                "opts": {
+                    "controllers": [
+                        "c0"
+                    ],
+                    "dpid": "1",
+                    "hostname": "cs0",
+                    "nodeNum": 0,
+                    "switchType": "default"
+                },
+                "x": "500",
+                "y": "100"
+            },            {
+                "number": "143",
+                "opts": {
+                    "controllers": [
+                        "c0"
+                    ],
+                    "dpid": "12c",
+                    "hostname": "axs115",
+                    "nodeNum": 299,
+                    "switchType": "default"
+                },
+                "x": "300",
+                "y": "2940"
+            }
+        ]
+        #print(switches)
+        not_contains = []
+
+        checkList(switches, 12+12**2+12**2, contains, not_contains, self)
+
+
     def testCreateSwitches(self):
         switches = generator.createSwitches(4)
 
-        core_contains = [
+        contains = [
             {
                 "number": "0",
                 "opts": {
@@ -245,9 +322,9 @@ class NodeTests(unittest.TestCase):
             }
         ]
         
-        core_not_contains = []
+        not_contains = []
 
-        checkList(switches, 4+16+16, core_contains, core_not_contains, self)
+        checkList(switches, 4+16+16, contains, not_contains, self)
 
     def testCreateCoreSwitches(self):
         (core_switches, global_next_switch_num) = generator.createCoreSwitches(4, 0)
