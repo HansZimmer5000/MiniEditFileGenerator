@@ -179,13 +179,111 @@ aggregatorCorePrefix = "acs"
 Will creat the Links between the Core Switches, begining at <corePrefix>0  with an interconnection degree of 3. It is expected that <coreswitch_count> is at least 4.
 '''
 
-def addUniqueLinks(links,new_link):
+
+def addUniqueLinks(links, new_link):
     orig_src = new_link.get("src")
     orig_dest = new_link.get("dest")
     for old_link in links:
         if old_link.get("src") == orig_dest and old_link.get("dest") == orig_src:
             return
     links.append(new_link)
+
+
+def createHostToAccessLinks(coreswitch_count):
+    host_count = coreswitch_count**2
+    links = []
+
+    for host in range(0, host_count):
+        current_host = "h" + str(host)
+        current_access = "xs" + str(host)
+        new_link = createLink(current_host, {}, current_access)
+        # No Duplicate check needed as no can be created.
+        links.append(new_link)
+
+    return links
+
+
+def createAccessToAggregatorLinks(coreswitch_count):
+    access_count = coreswitch_count**2
+    axs_count = int(coreswitch_count/2)
+    links = []
+
+    for access in range(0, access_count):
+        agg_group = int(access/4)  # 4=#PodElems
+        agg_axs = int(access/axs_count) % axs_count
+        current_access = "xs" + str(access)
+        current_axs = "axs" + str(agg_group) + str(agg_axs)
+        new_link = createLink(current_access, {}, current_axs)
+        # No Duplicate check needed as no can be created.
+        links.append(new_link)
+
+    return links
+
+
+def createInterAggregatorLinks(coreswitch_count):
+    # Beware that links are always bidirectional!
+    interconnection_degree = 3
+    acs_count = int(coreswitch_count/2)
+    axs_count = acs_count
+    links = []
+
+    if coreswitch_count >= 4:
+        for current_group in range(0, coreswitch_count):
+
+            # Create ACS Links
+            for current_acs in range(0, acs_count):
+                current_switch1 = "acs" + str(current_group) + str(current_acs)
+                current_switch2 = "acs" + \
+                    str(current_group) + str((current_acs+1) % acs_count)
+
+                new_link = createLink(current_switch1, {}, current_switch2)
+                addUniqueLinks(links, new_link)
+
+                for current_axs in range(0, axs_count):
+                    current_switch2 = "axs" + \
+                        str(current_group)+str(current_axs)
+                    new_link = createLink(current_switch1, {}, current_switch2)
+                    addUniqueLinks(links, new_link)
+
+            # Create AXS Links
+            for current_axs in range(0, axs_count):
+                current_switch1 = "axs" + str(current_group) + str(current_axs)
+                current_switch2 = "axs" + \
+                    str(current_group) + str((current_axs+1) % axs_count)
+
+                new_link = createLink(current_switch1, {}, current_switch2)
+                addUniqueLinks(links, new_link)
+
+                for current_acs in range(0, acs_count):
+                    current_switch2 = "acs" + \
+                        str(current_group)+str(current_acs)
+                    new_link = createLink(current_switch1, {}, current_switch2)
+                    addUniqueLinks(links, new_link)
+
+    return links
+
+
+def createAggregatorToCoreLinks(coreswitch_count):
+    links = []
+    acs_count_per_agg = int(coreswitch_count/2)
+    connections_to_core = 2
+
+    for aggregator in range(0, coreswitch_count):
+        for acs in range(0, acs_count_per_agg):
+            current_acs = "acs" + str(aggregator) + str(acs)
+
+            cs1 = ((aggregator * 2) + acs) % coreswitch_count
+            current_cs1 = "cs" + str(cs1)
+            new_link = createLink(current_acs, {}, current_cs1)
+            links.append(new_link)
+
+            cs2 = ((aggregator * 2) + acs + 1) % coreswitch_count
+            current_cs2 = "cs" + str(cs2)
+            new_link = createLink(current_acs, {}, current_cs2)
+            links.append(new_link)
+
+    return links
+
 
 def createInterCoreLinks(coreswitch_count):
     interconnection_degree = 3
@@ -200,135 +298,26 @@ def createInterCoreLinks(coreswitch_count):
                     str((current_index2 + current_index1) % coreswitch_count)
 
                 new_link = createLink(current_switch1, {}, current_switch2)
-                addUniqueLinks(links,new_link)
+                addUniqueLinks(links, new_link)
 
     return links
 
-def createInterAggregatorLinks(coreswitch_count):
-    # Beware that links are always bidirectional!
-    interconnection_degree = 3
-    acs_count = int(coreswitch_count/2)
-    axs_count = acs_count
+
+def createLinks(coreswitch_count):
     links = []
-    print(axs_count,acs_count)
+    # TODO How to link switches to controller, normal link or are they alredy connected due to "remote" key/value in switch?
 
-    if coreswitch_count >= 4:
-        for current_group in range(0, coreswitch_count):
+    host_links = createHostToAccessLinks(coreswitch_count)
+    access_links = createAccessToAggregatorLinks(coreswitch_count)
+    inter_agg_links = createInterAggregatorLinks(coreswitch_count)
+    agg_links = createAggregatorToCoreLinks(coreswitch_count)
+    inter_core_links = createInterCoreLinks(coreswitch_count)
 
-            # Create ACS Links
-            for current_acs in range(0, acs_count):
-                current_switch1 = "acs" + str(current_group) + str(current_acs)
-                current_switch2 = "acs" + str(current_group) + str((current_acs+1) % acs_count)
-
-                new_link = createLink(current_switch1, {}, current_switch2)
-                addUniqueLinks(links, new_link)
-
-                for current_axs in range(0, axs_count):
-                    current_switch2 = "axs" + str(current_group)+str(current_axs)
-                    new_link = createLink(current_switch1, {}, current_switch2)
-                    addUniqueLinks(links, new_link)
-
-            # Create AXS Links
-            for current_axs in range(0, axs_count):
-                current_switch1 = "axs" + str(current_group) + str(current_axs)
-                current_switch2 = "axs" + str(current_group) + str((current_axs+1)%axs_count)
-
-                new_link = createLink(current_switch1, {}, current_switch2)
-                addUniqueLinks(links, new_link)
-
-                for current_acs in range(0, acs_count):
-                    current_switch2 = "acs" + str(current_group)+str(current_acs)
-                    new_link = createLink(current_switch1, {}, current_switch2)
-                    addUniqueLinks(links, new_link)
-
-    return links
-       
-
-def createLinks(coreswitch_count, hostCount, controllername):
-    # Link Count with K=4
-    # Links Host -> Access = 16     16
-    # Links Access -> Aggr = 16     32
-    # Links Aggr -> Core   = 16     48
-    # Links Core -> Core   = 12     60
-    # Links Pods -> Pods   = 12*4   108
-    links = []
-
-    # Create Links from Host to Access Switch
-    for x in range(1, hostCount+1):
-        newLink = createLink("h" + str(x), {}, "xs" + str(x))
-        links.append(newLink)
-
-    # Create Links from Access Switches to Aggregator Switches
-    # "axs<num>" with num being >= 2 and square
-    aggregatorAccessSwitchCount = int(coreswitch_count*2)
-    nextXSNum = 1
-
-    for x in range(2, (aggregatorAccessSwitchCount*2)+1):
-        if (x % 2) == 0:
-            newLink = createLink("xs" + str(nextXSNum), {}, "axs" + str(x))
-            links.append(newLink)
-
-            newLink = createLink("xs" + str(nextXSNum + 1), {}, "axs" + str(x))
-            links.append(newLink)
-
-            nextXSNum += 2
-
-    # Create Links from Aggregator Switches to Core Switches
-    # "acs<num>" with num being >= 1 and not square
-    nextACSNum = 1
-    for x in range(1, coreswitch_count+1):
-        baseACSNum = nextACSNum
-        for y in range(0, int((aggregatorAccessSwitchCount*2)/coreswitch_count)):
-            nextACSNum = baseACSNum + (y * 2)
-            if nextACSNum > (aggregatorAccessSwitchCount*2):
-                nextACSNum %= (aggregatorAccessSwitchCount*2)
-
-            newLink = createLink("acs" + str(nextACSNum), {}, "cs" + str(x))
-            links.append(newLink)
-
-        nextACSNum += 2
-
-    # Create Links inside the Aggregator Pods
-    # first acs is 1, axs is 2. Next two switches in this pod are acs 3 and axs 4 (Example for CoreSwitch=4)
-    # TODO Are these links done twice? (acs15->acs13 && acs13->acs15)
-
-    aggregatorSwitchCount = aggregatorAccessSwitchCount * 2
-    for x in range(1, aggregatorSwitchCount + 1):
-        podNumber = int(x / 4)
-        if (x % coreswitch_count) != 0:
-            podNumber += 1
-
-        currentHighestNum = coreswitch_count * podNumber
-        currentLowestNum = currentHighestNum - (coreswitch_count - 1)
-
-        if (x % 2) == 0:
-            currentSwitch = "axs" + str(x)
-        else:
-            currentSwitch = "acs" + str(x)
-
-        for offset in range(1, 4):
-            nextNum = x + offset
-            if nextNum > currentHighestNum:
-                nextNum %= currentHighestNum
-                nextNum += (currentLowestNum - 1)
-
-            if (nextNum % 2) == 0:
-                links.append(createLink(
-                    currentSwitch, {}, "axs" + str(nextNum)))
-            else:
-                links.append(createLink(
-                    currentSwitch, {}, "acs" + str(nextNum)))
-
-    # Create Links inside the Core Switches
-    # TODO Are these links done twice? (cs1->cs2 && cs2->cs1)
-    for x in range(1, coreswitch_count + 1):
-        for y in range(1, 4):
-            targetNum = x+y
-            if targetNum > coreswitch_count:
-                targetNum %= coreswitch_count
-
-            newLink = createLink("cs" + str(x), {}, "cs" + str(targetNum))
-            links.append(newLink)
+    links += host_links
+    links += access_links
+    links += inter_agg_links
+    links += agg_links
+    links += inter_core_links
 
     return links
 
@@ -355,7 +344,7 @@ def createTopology(coreswitch_count, exportFile):
     hosts = createHosts(hostsCount)
 
     # Create Links
-    links = createLinks(coreswitch_count, hostsCount, controllername)
+    links = createLinks(coreswitch_count)
 
     # CreateApplication
     application = createApplication()
