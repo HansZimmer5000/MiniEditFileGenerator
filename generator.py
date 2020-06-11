@@ -11,6 +11,7 @@ def createHost(number, hostname, nodeNum, sched, x, y):
         "number": number,
         "opts": {
             "hostname": hostname,
+            "ip": "10.0.0." + str(nodeNum + 1), # Starts at 1 not 0.
             "nodeNum": nodeNum,
             "sched": sched
         },
@@ -36,7 +37,7 @@ def createSwitch(number, controller, hostname, nodeNum, switchType, x, y, dpid):
             "controllers": [
                 controller
             ],
-            "dpid": dpid,
+            "dpid": dpid, 
             "hostname": hostname,
             "nodeNum": nodeNum,
             "switchType": switchType
@@ -98,7 +99,7 @@ def __createSwitchesOf(prefix, count, global_next_switch_num, x, y=100, start_nu
         current_name = prefix + str(current_number)
         current_y = str(y+(40*current_number))
         current_switch_num = str(current_number + start_number)
-        current_dpid = hex(global_next_switch_num+1).replace("0x", "")
+        current_dpid = hex(global_next_switch_num+1).replace("0x", "")  # Starts at 1 not 0.
 
         new_switch = createSwitch(
             current_switch_num, "c0", current_name, global_next_switch_num, "default", x, current_y, current_dpid)
@@ -381,6 +382,7 @@ def createTopology(coreswitch_count, exportFile):
 
 if __name__ == "__main__":
     print("Beware! This generator is currently quite hardcoded to work with the topolgy described in 'SDN on ACIDs'!\n")
+    print("If K>15, then adjust IP in createHost!")
 
     createTopology(4, 'small.json')
     createTopology(8, 'medium.json')

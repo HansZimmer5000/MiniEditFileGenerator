@@ -395,6 +395,7 @@ class NodeTests(unittest.TestCase):
                 "number": "0",
                 "opts": {
                     "hostname": "h0",
+                    "ip": "10.0.0.1",
                     "nodeNum": 0,
                     "sched": "host"
                 },
@@ -405,6 +406,7 @@ class NodeTests(unittest.TestCase):
                 "number": "1",
                 "opts": {
                     "hostname": "h1",
+                    "ip": "10.0.0.2",
                     "nodeNum": 1,
                     "sched": "host"
                 },
@@ -415,6 +417,7 @@ class NodeTests(unittest.TestCase):
                 "number": "15",
                 "opts": {
                     "hostname": "h15",
+                    "ip": "10.0.0.16",
                     "nodeNum": 15,
                     "sched": "host"
                 },
